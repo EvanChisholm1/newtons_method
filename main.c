@@ -22,6 +22,26 @@ double poly_prime(double *coefficients, int degree, double x) {
     return result;
 }
 
+double search(double *coefficients, int degree, double initial_guess) {
+    double x = initial_guess;
+    double x_new;
+
+    while(1) {
+        double bottom = poly_prime(coefficients, degree, x);
+        if(bottom == 0) bottom += 0.0000001;
+
+        x_new = x - poly(coefficients, degree, x) / bottom;
+
+        if(fabs(x_new - x) < 0.00001) {
+            break;
+        }
+
+        x = x_new;
+    }
+
+    return x_new;
+}
+
 int print_eqn(double *coefficients, int degree) {
     for (int i = 0; i <= degree; i++) {
         if(coefficients[i] == 0.0) continue;
@@ -49,28 +69,23 @@ int main() {
         scanf("%lf", &coefficients[i]);
     }
 
-
     print_eqn(coefficients, degree);
 
-
-    double x, x_new;
-
-    printf("Enter the initial guess: ");
-    scanf("%lf", &x);
-
     while(1) {
-        x_new = x - poly(coefficients, degree, x) / poly_prime(coefficients, degree, x);
+        double x;
 
-        printf("%lf\n", x_new);
+        printf("Enter the initial guess: ");
+        scanf("%lf", &x);
 
-        if(fabs(x_new - x) < 0.00001) {
+        double converged_x = search(coefficients, degree, x);
+
+        if(fabs(poly(coefficients, degree, converged_x)) < 0.00001) {
+            printf("The root of the equation is %lf\n", converged_x);
             break;
+        } else {
+            printf("did not converge to a zero try another initial x value\n");
         }
-
-        x = x_new;
     }
-
-    printf("The root of the equation is: %lf\n", x_new);
 
     return 0;
 }
